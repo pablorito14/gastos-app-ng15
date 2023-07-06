@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site":"administrador-gastos",
+    "public": "dist/gastos-frontend",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

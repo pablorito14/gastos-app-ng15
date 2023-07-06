@@ -1,0 +1,109 @@
+<p-blockUI [blocked]="loading " styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="col-12 md:col-10 xl:col-8 px-3">
+    <p-card styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast mb-3">
+      <div class="p-card-title ng-star-inserted flex justify-content-between">
+        <span>Detalles del resumen</span>
+        <span class="mr-2 cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+          <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+      </div>
+      <div class="grid">
+        <div class="col-12 md:col-6 xl:col-4 md:flex-order-1 border-bottom-1 md:border-bottom-none md:border-left-1">
+          <p class="my-2"><strong>Banco:</strong> {{ resumen.tarjeta | formatoString:'banco' }}</p>
+          <p class="my-2"><strong>Tarjeta:</strong> <span [innerHTML]="resumen.tarjeta | strTarjeta:'detallesResumen'"></span></p>
+          <p class="my-2"><strong>Estado:</strong> {{ resumen.tarjeta.estado == 'active' ? 'Activa' : 'Vencida' }}</p>
+          <p class="my-2"><strong>Periodo:</strong> {{ resumen.inicio | date:'mediumDate' }} - {{ resumen.cierre | date:'mediumDate' }}</p>
+          <p class="my-2"><strong>Vencimiento:</strong> {{ resumen.vencimiento | date:'mediumDate' }}</p>
+        </div>
+        
+        <div class="col-12 md:col-6 xl:col-8 md:flex-order-0">
+          <p class="my-2"><strong>Monto en pesos:</strong> {{ montoPesos | currency:'$':'symbol-narrow':'1.2-2' }}</p>
+          <!-- <p class="my-2"><strong>Monto en dólares:</strong> {{ montoDolares | currency:'U$D':'symbol-narrow':'1.2-2' }}</p> -->
+          <p class="my-2">
+            <strong>Monto en U$D/€:</strong> 
+            {{ montoDolares | currency:'U$D':'symbol-narrow':'1.2-2' }} / 
+            {{ montoEuros | currency:'€':'symbol-narrow':'1.2-2' }}
+          </p>
+
+          <ul class="list-none mt-1 pl-2">
+            <li class="text-sm">Impuestos moneda extranjera</li>
+            <li class="text-sm">- {{ imp_rg4815*100 }}%: {{ str_imp_rg4815 }}</li>
+            <li class="text-sm">- {{ imp_pais*100 }}%: {{ str_imp_pais }}</li>
+            <li class="text-sm">- {{ imp_catar*100 }}%: {{ str_imp_catar }}</li>
+            <!-- <li class="text-sm">- {{ imp_rg4815*100 }}%: {{ (imp_d_rg4815 > 0) ? ((imp_d_rg4815 | currency:'U$D':'symbol-narrow':'1.2-2')) : '--' }}</li>
+            <li class="text-sm">- {{ imp_pais*100 }}%: {{ (imp_d_pais > 0) ? (imp_d_pais | currency:'U$D':'symbol-narrow':'1.2-2') : '--' }}</li>
+            <li class="text-sm">- {{ imp_catar*100 }}%: {{ (imp_d_catar > 0) ? (imp_d_catar | currency:'U$D':'symbol-narrow':'1.2-2') : '--' }}</li> -->
+          </ul>
+          
+          <p class="mt-2 mb-1"><strong>Total a pagar :</strong> 
+            {{ montoTotal | currency:'$':'symbol-narrow':'1.2-2' }}
+            <!-- {{ montoPesos + (montoDolares+imp_rg4815+imp_pais+imp_catar)*cotizacion | currency:'$':'symbol-narrow':'1.2-2' }} -->
+          </p> 
+          <p class="text-sm my-1" *ngIf="montoDolares > 0 || montoEuros > 0">
+            Valor aproximado, calculado a partir de la cotizacion de ambito.com {{ strCotizacion }}. <br>
+            U$D 1 = {{ cotizacion | currency:'$':'symbol-narrow':'1.2-2' }} / € 1 = {{ cotizacion_euro | currency:'$':'symbol-narrow':'1.2-2'}}
+          </p>
+          
+        </div>
+        
+      </div>
+      
+      
+      <p-table [value]="cuotas" responsiveLayout="stack" breakpoint="1100px" styleClass="w-full border-top-1 mt-2 cuotas-table" *ngIf="cuotas.length > 0; else sinConsumos">
+        
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th class="text-center px-0" style="width: 15%;">Fecha compra</th>
+            <th class="px-2" style="width: 55%;">Descripción</th>
+            <th class="text-right px-2" style="width: 15%;">Monto</th>
+            <!-- <th class="text-center px-2">Categoria</th> -->
+            <th class="text-right md:text-center px-2">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cuota let-columns="columns">
+          <tr>
+            <td class="md:text-center px-0"><span class="p-column-title">Fecha compra</span>{{ cuota.gasto.fecha | date:'mediumDate' }}</td>  
+            <td class="px-0 lg:px-2"><span class="p-column-title">Descripción</span>{{ cuota.descripcion }}</td>
+            <td class="px-0 lg:px-2 md:text-right"><span class="p-column-title">Monto</span>{{ cuota.monto | currency:cuota.gasto.moneda:'symbol-narrow':'1.2-2' }}</td>
+            <!-- <td class="px-0 lg:px-2 md:text-center"><span class="p-column-title">Categoria</span>{{ cuota.gasto.categoria | titlecase }}</td> -->
+            <td class="px-0 text-center text-base column-actions">
+              <span class="p-column-title">Acciones</span>
+              <span *ngIf="deletingID != cuota.gasto._id;else procesando">
+
+                <span *ngIf="!cuota.gasto.fecha_baja; else susc_cancelada">
+                  <span class="px-2 cursor-pointer" [routerLink]="['/user/gastos',cuota.gasto._id]" >
+                    <i class="fa-regular- fa-duotone fa-pen-to-square text-primary-700 hover:text-primary-300" pTooltip="Editar consumo"></i>
+                  </span>
+                  <span class="px-2 cursor-pointer" (click)="confirm(cuota.gasto._id,$event)">
+                    <i class="fa-solid- fa-duotone fa-trash text-red-500 hover:text-red-300" pTooltip="Eliminar consumo"></i>
+                  </span>
+                </span>
+                <ng-template #susc_cancelada>
+                  <span class="px-2">
+                    <i class="fa-regular- fa-duotone fa-pen-to-square text-400"></i>
+                  </span>
+                  <span class="px-2">
+                    <i class="fa-solid- fa-duotone fa-trash text-400"></i>
+                  </span>
+                </ng-template>
+
+              </span>
+              <ng-template #procesando><i class="px-2 fa-solid- fa-duotone fa-spinner fa-spin"></i></ng-template>
+              
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <ng-template #sinConsumos>
+        <div class="border-top-1 text-center mt-4 pt-2">
+          Aún no hay consumos en este resumen
+        </div>
+      </ng-template>
+      
+      <p-confirmPopup></p-confirmPopup>
+    </p-card>
+  </div>
+</div>

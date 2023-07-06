@@ -1,0 +1,111 @@
+<p-blockUI [blocked]="loading " styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="col-12 md:col-8 xl:col-3 px-3">
+    <p-card header="{{ accion | titlecase }} categoria" styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast mb-3">
+      <form [formGroup]="categoriaForm" (ngSubmit)="guardar()">
+        <div class="grid justify-content-center align-items-center">
+          
+          <div class="col-9 px-1 mb-1">
+            <div class="p-float-label">
+              <input type="text" id="descripcion" pInputText placeholder="Descripcion"
+                      formControlName="descripcion" class="w-full border-round-left-2xl" [ngClass]="{'ng-dirty ng-invalid':validarCampo('descripcion')}">
+              <label for="descripcion">Descripción</label>
+            </div>
+          </div>
+
+          <div class="col-3 px-1 mb-1">
+            
+            <div class="w-full border-round-left-sm border-round-right-2xl" 
+                  [ngStyle]="{'background-color': categoriaForm.get('color')?.value}">
+              <input type="color" formControlName="color" class="w-full opacity-0 relative color-picker-categoria cursor-pointer"
+                      [value]="categoriaForm.get('color')?.value">
+            </div>
+          </div>
+
+          <div class="col-6 xl:col-6 px-1">
+            <button pButton pRipple type="button" class="p-button-outlined w-full border-round-left-2xl"
+                    [disabled]="process" iconPos="left" icon="fa-solid fa-arrows-rotate" (click)="resetear()"
+                    label="Resetear"></button>
+            
+          </div>
+          <div class="col-6 xl:col-6 px-1">
+            <button pButton pRipple type="submit" class="w-full border-round-right-2xl" [loading]="process" 
+                    [disabled]="process" iconPos="right" icon="fa-regular fa-floppy-disk"
+                    label="{{ accion == 'agregar' ? 'Guardar' : 'Actualizar' }}"></button>
+          </div>
+
+          
+        </div>
+      </form>
+      
+    </p-card>
+  </div>
+
+  <div class="col-12 md:col-8 xl:col-4 px-3">
+    <p-card styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast">
+      <div class="p-card-title ng-star-inserted flex justify-content-between">
+        <span>Listado de categorías</span>
+        <span class="mr-2 cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+          <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+      </div>
+      <p-table [value]="categorias" responsiveLayout="default" class="tabla-categorias">
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th class="w-7 px-1 text-left">Categoría</th>
+                <th class="w-2 px-1 text-center">Color</th>  
+                <th class="w-3 px-2 text-right">Acción</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cat>
+            <tr class="border-top-1 md:border-top-none">
+                <td class="pl-1- px-1 text-left">
+                  <span>{{ cat.descripcion }}</span>
+                    
+                </td>
+                <td class="px-1 py-2">
+                  <div class="color-categoria border-round-lg" [ngStyle]="{'background-color': cat.color}"></div>
+                </td>
+                
+                <td class="pr-2- px-1 text-right">
+                  <div class="" *ngIf="cat.usuario;else noEdit">
+                    <span *ngIf="deletingID != cat._id; else procesando">
+                      <span class="px-2 cursor-pointer" (click)="buscarCategoria(cat._id)">
+                        <i class="fa-regular- fa-duotone fa-pen-to-square text-primary-700 hover:text-primary-300" pTooltip="Editar categoría"></i>
+                      </span>
+                      <span class="px-2 cursor-pointer" (click)="confirm(cat._id,$event)">
+                        <i class="fa-solid- fa-duotone fa-trash text-red-500 hover:text-red-300" pTooltip="Eliminar categoría"></i>
+                      </span>
+                    </span>
+                    <ng-template #procesando> 
+                      <i class="px-2 fa-solid- fa-duotone fa-spinner fa-spin"></i>
+                    </ng-template>
+                    
+                  </div>
+                  <ng-template #noEdit>
+                    <span class="px-2">
+                      <i class="fa-regular- fa-duotone fa-pen-to-square text-400"></i>
+                    </span>
+                    <span class="px-2">
+                      <i class="fa-solid- fa-duotone fa-trash text-400"></i>
+                    </span>
+                  </ng-template>
+                  
+                </td>
+            </tr>
+        </ng-template>
+
+      </p-table>
+      <p-confirmPopup></p-confirmPopup>
+    </p-card>
+  </div>
+</div>
+
+
+
+
+
+
+

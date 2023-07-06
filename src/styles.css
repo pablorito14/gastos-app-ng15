@@ -1,0 +1,55 @@
+/* You can add global styles to this file, and also import other style files */
+body{
+  margin: 0;
+  padding: 0;
+  overflow: overlay;
+  /* overscroll-behavior-y: none; */
+  
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+::-moz-scrollbar{
+  -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+    width:10px;    
+}
+
+::-webkit-scrollbar-button:increment,::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #535253;
+    border-radius: 20px;
+    border: 1px solid #9a9a9a;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+
+
+.p-card-body{
+  padding: 1rem !important
+}
+
+.p-inputtext,
+.p-dropdown .p-inputtext,
+.p-calendar .p-inputtext,
+.p-inputnumber .p-inputtext{
+  padding-right: 0 !important;
+  /* padding-left: .5rem !important; */
+}
+
+.p-dropdown-items-wrapper {
+  max-height: 50vh !important;
+}

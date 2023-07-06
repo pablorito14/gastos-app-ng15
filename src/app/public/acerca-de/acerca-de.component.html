@@ -1,0 +1,15 @@
+<div class="grid flex justify-content-center">
+  <div class="col-12 md:col-10 xl:col-8 px-3">
+    
+    <p-card header="Historial de cambios" styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast">
+      <div *ngFor="let version of versiones">
+        <h3 class="my-1">Version: {{ version.version }}</h3>
+        <ul class="mt-1">
+          <li *ngFor="let cambios of version.cambios">{{ cambios }}</li>
+        </ul>
+      </div>
+      
+    </p-card>
+  </div>
+</div>
+

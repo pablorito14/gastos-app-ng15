@@ -1,0 +1,156 @@
+<p-blockUI [blocked]="loading " styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="col-12 lg:col-9 xl:col-8 px-3">
+    <div class="animate__animated animate__fadeIn animate__fast mb-3-" *ngIf="!loading">
+      <div class="grid p-0 m-0">
+        <div class="col-12 p-0 text-center-">
+            <p-dropdown appendTo="body" [(ngModel)]="tarjetaSel" [options]="(allData | tarjetas:'estadisticas')" id="tarjeta" placeholder="Tarjeta" optionLabel="descripcion" 
+                        optionValue="_id" styleClass="w-full border-round-2xl" (onChange)="cambiarTarjeta($event.value)"
+                        ></p-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid flex justify-content-center" *ngIf="!loading && !mostrarDetallesCategoria ">
+  <div class="col-12 lg:col-9 xl:col-8 px-3">
+    <p-card  class="animate__animated animate__fadeIn animate__fast mb-3" *ngIf="!loading && dataShow">
+      <div class="grid justify-content-center">
+        <div class="col-12 lg:col-8- text-center">
+          <div class="p-card-title ng-star-inserted mb-0 flex justify-content-between align-items-center">
+            <div style="min-width: 25px;"></div>
+            <div class="font-bold text-xl" [innerHTML]="dataShow | strTarjeta:'estadisticas'"></div>
+            <span class="mr-2- cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+              <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+          </div>
+          <!-- <div class="font-bold text-xl" [innerHTML]="dataShow | strTarjeta:'estadisticas'"></div>   -->
+        </div>
+        <div class="col-12 lg:col-9 md:inline-flex text-center align-items-center">
+          <div class="w-full mb-2 md:mb-0 md:flex-order-1"> 
+            
+            <span *ngIf="resumenActual; else noResumen">
+              <div class="font-medium">{{ strResumenActual }} {{ (dataShow.debito) ? moment(resumenActual.inicio).format('MMMM YYYY') : '' }}</div>
+              <div>{{ moment(resumenActual!.inicio).format('ddd DD [de] MMM YY') }} - {{ moment(resumenActual!.cierre).format('ddd DD [de] MMM YY') }}</div>
+            </span>
+            <ng-template #noResumen>
+              No hay resúmenes para esta tarjeta
+            </ng-template>
+          </div>
+
+          <span class="w-6 md:flex-order-0">
+            <button pButton pRipple type="button" label="Anterior"  icon="fa-solid- fa-duotone fa-angles-left fa-lg" 
+                    class="p-button-raised p-button-text p-button-plain m-2 border-round-left-2xl" [disabled]="dataShow.resumenes.length <= 0 || (resumenActual.indice+1) >= dataShow.resumenes.length"
+                    (click)="prevResumen(resumenActual.indice)"></button>
+          </span>
+          <span class="w-6 md:flex-order-2">
+            <button pButton pRipple type="button" label="Siguiente" icon="fa-solid- fa-duotone fa-angles-right fa-lg" iconPos="right" 
+                    class="p-button-raised p-button-text p-button-plain m-2 border-round-right-2xl" [disabled]="dataShow.resumenes.length <= 0 || resumenActual.indice == 0"
+                    (click)="nextResumen(resumenActual.indice)"></button>
+          </span>
+        </div>
+      </div>
+
+      <div class="grid align-items-center" *ngIf="resumenActual">
+        <div class="col-12 md:col-8 flex justify-content-center mt-2 px-0 chart-style" *ngIf="resumenActual.cuotas.length > 0; else noCuotas">
+          
+          <canvas baseChart id="chart"
+            [plugins]="plugins"
+            [data]="data" 
+            [options]="options"
+            type="doughnut">
+          </canvas>
+        </div>
+        <ng-template #noCuotas>
+          <div class="col-12 flex justify-content-center">
+            <span class="font-bold text-xl mt-3">No hay gastos para este {{ dataShow.debito ? 'periodo' : 'resumen' }}</span>
+          </div>
+          
+        </ng-template>
+      
+        <div class="col-12 md:col-4" *ngIf="resumenActual">
+          <ng-template ngFor let-cat [ngForOf]="resumenActual.acumuladores">
+            <div class="block px-2 py-3- my-2 border-round-lg font-bold text-white cursor-pointer border-1"  
+                  *ngIf="cat.valor != 0" [ngStyle]="{'background-color':cat.color}">
+              <div class="grid">
+                <div class="col-8 px-0 py-3" (click)="agregarGastoACategoria(cat.id)">
+                  {{ cat.categoria}}
+                </div>
+                <div class="col-4 text-right px-0 py-3" (click)="agregarGastoACategoria(cat.id)">
+                  {{ cat.valor | currency:'$':'symbol-narrow':'1.0-0' }}
+                </div>
+              </div>
+              
+            </div>
+          </ng-template>
+          
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>
+ 
+
+<div class="grid flex justify-content-center" *ngIf="!loading && mostrarDetallesCategoria">
+  <div class="col-12 lg:col-9 xl:col-4 px-3">
+    <p-card class="animate__animated animate__fadeIn animate__fast mb-3 detalles-categoria" *ngIf="!loading">
+      <div class="grid px-2 justify-content-center align-items-center">
+        <div class="col-2">
+          <span role="button" class="cursor-pointer" (click)="mostrarDetallesCategoria = false">
+            <i class="fa-solid- fa-duotone fa-angles-left fa-xl"></i>
+          </span>
+        </div>
+        <div class="col text-center" >
+          <div class="py-2- w-full border-round-xl text-xl font-bold"
+                [ngStyle]="{'color-':categoriaSel.color}">
+            {{ categoriaSel.categoria }} 
+        </div>
+          
+        </div>
+        <div class="col-2 text-right">
+          <span class="cursor-pointer" [routerLink]="['/user/gastos/cat',categoriaSel.id]">
+            <i class="fa-regular fa-square-plus fa-xl"></i>
+          </span>
+          
+        </div>   
+
+      </div>
+
+      <!-- <div class="grid"> -->
+        <!-- <div class="col-12"> -->
+          <div class="block p-1 md:mx-2 my-2 border-round-lg font-bold text-white cursor-pointer" 
+              *ngFor="let consumo of gastosPorCategoria"
+              [ngStyle]="{'background-color':categoriaSel.color}"
+              [routerLink]="[ '/user/gastos', consumo._id ]" >
+              
+
+              <div class="grid">
+
+                <div class="col-2">
+                  {{ moment((consumo.fecha) ?? consumo.gasto.fecha).format('DD/MM') }}
+                </div>
+
+                <div class="col-6 white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                  {{ consumo.descripcion }}
+                  
+                </div>
+                <div class="col-4 text-right pl-0">
+                  {{ (consumo.monto | currency:(consumo.moneda ?? consumo.gasto.moneda):'symbol-narrow':'1.2-2') }}
+                </div>
+                <!-- <div class="col-4 text-right pl-0">
+                  {{((dataShow.debito && consumo.moneda == '$') || (!dataShow.debito && consumo.gasto.moneda == '$'))  
+                      ? (consumo.monto | currency:'$':'symbol-narrow':'1.0-0') 
+                      : (consumo.monto | currency:'U$D':'symbol-narrow':'1.2-2') }}
+                </div> -->
+              </div>
+              
+          </div>
+        <!-- </div> -->
+      <!-- </div> -->
+      
+    </p-card>
+    
+  </div>
+</div>

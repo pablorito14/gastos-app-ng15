@@ -1,0 +1,58 @@
+<p-blockUI [blocked]="loading " styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="col-12 lg:col-9 xl:col-8 px-3">
+    <div class="animate__animated animate__fadeIn animate__fast mb-3-" *ngIf="!loading">
+      <div class="grid p-0 m-0">
+        <div class="col-12 p-0 text-center-">
+            <p-dropdown appendTo="body" [(ngModel)]="tarjetaSel" [options]="(tarjetas | tarjetas:'cuotasPendientes')" id="tarjeta" placeholder="Filtrar por tarjeta" optionLabel="descripcion" 
+                        optionValue="_id" styleClass="w-full border-round-2xl" [showClear]="true"
+                        ></p-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid flex justify-content-center">
+  <div class="col-12 lg:col-9 xl:col-9 px-3">
+    <p-card class="animate__animated animate__fadeIn animate__fast mb-3" *ngIf="!loading">
+      <div class="p-card-title ng-star-inserted flex justify-content-between">
+        <span>Cuotas pendientes</span>
+        <span class="mr-2 cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+          <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+      </div>
+      <p-table [value]="cuotasPend | filtarCuotas:tarjetaSel" breakpoint="768px" styleClass="w-full" 
+                *ngIf="cuotasPend.length > 0; else noPendientes">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="pl-0">Tarjeta</th>
+            <th class="md:pl-2">Gasto</th>
+            <th class="text-center">Fecha compra</th>
+            <th class="pr-0 text-right">Pendientes</th>
+            <th class="pr-0 text-right">Monto cuota</th>
+            <th class="pr-0 text-right">Monto restante</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cuota>
+          <!-- border-top-1 md:border-top-none -->
+          <tr class="border-top-1 md:border-top-none">
+            <td class="py-2 px-0"><span class="p-column-title">Tarjeta</span><span [innerHTML]="cuota.tarjeta | strTarjeta:'cuotasPendientes'"></span></td>
+            <td class="py-2 px-0 md:px-2 text-right md:text-left"><span class="p-column-title">Gasto</span>{{ cuota.descripcion }}</td>
+            <td class="py-2 px-0 text-center"><span class="p-column-title">Fecha compra</span>{{ moment(cuota.fecha).format('DD/MM/YYYY') }}</td>
+            <td class="py-2 px-0 text-right"><span class="p-column-title">Pendientes</span>{{ cuota.pendientes | i18nPlural:strCuotas }}</td>
+            <td class="py-2 px-0 text-right"><span class="p-column-title">Monto cuota</span>{{ cuota.montoCuota | currency:cuota.moneda:'symbol-narrow':'1.2-2' }}</td>
+            <td class="py-2 px-0 text-right"><span class="p-column-title">Monto restante</span>{{ cuota.montoRestante | currency:cuota.moneda:'symbol-narrow':'1.2-2' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <ng-template #noPendientes>
+        <span class="font-bold- text-xl mt-3">No hay cuotas pendientes</span>
+      </ng-template>
+      
+
+    </p-card>
+  </div>
+</div>

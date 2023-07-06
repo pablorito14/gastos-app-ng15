@@ -1,0 +1,161 @@
+<p-blockUI [blocked]="loading" styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="hidden- col-12 md:col-8 lg:col-6 xl:col-8 px-3">
+    <p-card styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast pt-0 mb-2 formulario-card">
+      <div class="grid cursor-pointer p-3" (click)="toggleFormulario = !toggleFormulario" [ngClass]="{'pb-1': toggleFormulario}">
+        <div class="col p-0">
+          <h2 class="my-0">{{ accion | titlecase }} resumen</h2>
+        </div>
+        <div class="col-1 p-0 pr-3 text-right">
+          <h2 class="my-0" ><i class="fa-solid fa-angle-down " [ngClass]="{'rotate-180': toggleFormulario}"></i></h2>
+        </div>
+      </div>
+      
+      <div *ngIf="toggleFormulario" class="scalein- mt-2 p-3 pt-0">
+        <form [formGroup]="resumenForm" (ngSubmit)="guardar()">
+          <div class="grid justify-content-center">
+            <div class="col-6 xl:col-3 pl-0 pr-1 xl:px-2 mb-1">
+              <div class="p-float-label">
+                <p-dropdown appendTo="body" #tarjeta [options]="(tarjetas | tarjetas:'newResumen')" id="tarjeta" placeholder="tarjeta" optionLabel="descripcion" 
+                            optionValue="_id" formControlName="tarjeta" styleClass="w-full border-round-left-2xl"
+                            [ngClass]="{'ng-dirty ng-invalid':validarCampo('tarjeta')}"></p-dropdown>
+                <label for="tarjeta">Tarjeta</label>
+              </div>
+            </div>
+  
+            <div class="col-6 xl:col-3 pl-1 pr-0 xl:px-2 mb-1">
+              <div class="p-float-label">
+                <p-calendar appendTo="body" inputId="inicio" [readonlyInput]="true" formControlName="inicio" [showButtonBar]="true"
+                            [showIcon]="true" styleClass="w-full border-round-right-2xl xl:border-round-right-sm"  dateFormat="dd/mm/yy" [maxDate]="resumenForm.get('cierre')?.value"
+                            [ngClass]="{'ng-dirty ng-invalid':validarCampo('inicio')}"
+                            ></p-calendar>
+                <label for="inicio">Inicio</label>
+              </div>
+            </div>
+  
+            <div class="col-6 xl:col-3 pl-0 pr-1 xl:px-2 mb-1">
+              <div class="p-float-label">
+                
+                  <p-calendar appendTo="body" inputId="cierre" [readonlyInput]="true" formControlName="cierre"  
+                          [showButtonBar]="true" [minDate]="resumenForm.get('inicio')?.value" [maxDate]="resumenForm.get('vencimiento')?.value"
+                          [showIcon]="true" styleClass="w-full border-round-left-2xl xl:border-round-left-sm" dateFormat="dd/mm/yy"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('cierre')}"
+                          ></p-calendar>
+                  <label for="cierre">Cierre</label>
+                </div>
+            </div>
+  
+            <div class="col-6 xl:col-3 pl-1 pr-0 xl:px-2 mb-1">
+              <div class="p-float-label">
+                <p-calendar appendTo="body" inputId="vencimiento" [readonlyInput]="true" formControlName="vencimiento"  [showButtonBar]="true"
+                            [showIcon]="true" styleClass="w-full border-round-right-2xl" dateFormat="dd/mm/yy" [minDate]="resumenForm.get('cierre')?.value"
+                            [ngClass]="{'ng-dirty ng-invalid':validarCampo('vencimiento')}"
+                            ></p-calendar>
+                <label for="vencimiento">Vencimiento</label>
+              </div>
+            </div>
+            
+            <div class="col-6 xl:col-3 pl-0 pr-1 xl:px-2">
+              <button pButton pRipple type="button" class="p-button-outlined w-full border-round-left-2xl"
+                      [disabled]="process" iconPos="left" icon="fa-solid fa-arrows-rotate" (click)="resetear()"
+                      label="Resetear"></button>
+              
+            </div>
+  
+            <div class="col-6 xl:col-3 pl-1 pr-0 xl:px-2">
+              <button pButton pRipple type="submit" class="w-full border-round-right-2xl" 
+                      [loading]="process" [disabled]="process" iconPos="right" icon="fa-regular fa-floppy-disk"
+                      label="{{ accion == 'agregar' ? 'Guardar' : 'Actualizar' }}"></button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </p-card>
+  </div>
+
+  
+  <!-- <div class="col-12 md:col-8 lg:col-10 xl:col-10 px-3"> -->
+  <div class="col-12 md:col-8 xl:col-8 px-3">
+    <p-card styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast">
+      <div class="p-card-title ng-star-inserted flex justify-content-between">
+        <span>Listado de resúmenes</span>
+        <span class="mr-2 cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+          <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+      </div>
+      <div class="p-float-label">
+        <p-dropdown [options]="(tarjetas | tarjetas:'resumenes')" inputId="filtrar" placeholder="Tarjeta" [(ngModel)]="filtrarTarjeta" optionLabel="descripcion" 
+                          optionValue="_id" [showClear]="true" styleClass="w-full mb-2 border-round-2xl" (ngModelChange)="guardarFiltro()"
+                          ></p-dropdown>
+        <label for="filtrar">Tarjeta</label>
+      </div>
+      <p-table responsiveLayout="stack" [value]="resumenes | filtrarResumenes:filtrarTarjeta" breakpoint="992px" styleClass="w-full" *ngIf="resumenes.length > 0">
+        
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th class="">Tarjeta</th>
+                <th class="text-center">Inicio</th>
+                <th class="text-center">Cierre</th>
+                <th class="text-center">Vencimiento</th>
+                <th class="text-right pr-0">Total</th>
+                <th class="text-right">Acciones</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-resumen>
+            <tr class="border-top-1 md:border-top-none">
+                <td class="text-right md:text-left py-2 px-2 md:px-2">
+                  <span class="p-column-title">Tarjeta</span>
+                  <div [innerHTML]="resumen.tarjeta | strTarjeta:'resumenes'"></div>
+                </td>
+                <td class="text-right md:text-center py-2 px-2">
+                  <span class="p-column-title">Inicio</span>
+                  {{ moment(resumen.inicio).format('DD/MM/Y') }}
+                </td>
+                <td class="text-right md:text-center py-2 px-2">
+                  <span class="p-column-title">Cierre</span>
+                  {{ moment(resumen.cierre).format('DD/MM/Y') }}
+                </td>
+                <td class="text-right md:text-center py-2 px-2">
+                  <span class="p-column-title">Vencimiento</span>
+                  {{ moment(resumen.vencimiento).format('DD/MM/Y') }}
+                </td>
+                <td class="text-right py-2 pl-2 pr-2 md:pr-0">
+                  <span class="p-column-title">Total</span>
+                  {{ resumen.montoPesos | currency:'$':'symbol-narrow':'1.2-2' }} / 
+                  {{ resumen.montoDolares | currency:'U$D':'symbol-narrow':'1.2-2' }} / 
+                  {{ resumen.montoEuros | currency:'€':'symbol-narrow':'1.2-2' }}
+                </td>
+                <td class="text-center lg:text-right py-2 px-0">
+                  <span class="w-full inline-block lg:hidden">
+                    <button pButton class="p-button-sm p-button-info w-4 border-round-left-2xl" [routerLink]="['/user/detalles-resumen',resumen._id]" label="Detalles"></button>
+                    <button pButton class="p-button-sm mx-2 w-3" (click)="buscarResumen(resumen._id)" label="Editar"></button>
+                    <button pButton class="p-button-sm p-button-danger w-4 border-round-right-2xl" 
+                            [loading]="deletingID == resumen._id" [disabled]="deletingID == resumen._id" iconPos="right"
+                            (click)="confirm(resumen._id,$event)" label="Eliminar"></button>
+                  </span> 
+                  
+                  <div class="hidden lg:block">
+                    <span *ngIf="deletingID != resumen._id;else procesando">
+                      <span class="px-2 cursor-pointer" [routerLink]="['/user/detalles-resumen',resumen._id]" >
+                        <i class="fa-regular- fa-duotone fa-memo-circle-info text-cyan-700 hover:text-cyan-600" pTooltip="Detalles del resumen"></i>
+                      </span>
+                      <span class="px-2 cursor-pointer" (click)="buscarResumen(resumen._id)">
+                        <i class="fa-regular- fa-duotone fa-pen-to-square text-primary-700 hover:text-primary-300"  pTooltip="Editar resumen"></i>
+                      </span>
+                      <span class="px-2 cursor-pointer" (click)="confirm(resumen._id,$event)">
+                        <i class="fa-solid- fa-duotone fa-trash text-red-500 hover:text-red-300"  pTooltip="Eliminar resumen"></i>
+                      </span>
+                    </span>
+                    <ng-template #procesando><i class="px-2 fa-solid- fa-duotone fa-spinner fa-spin"></i></ng-template>
+                    
+                  </div>
+                </td>
+            </tr>
+        </ng-template>
+      </p-table>
+      <p-confirmPopup></p-confirmPopup>
+    </p-card>
+  </div>
+</div>

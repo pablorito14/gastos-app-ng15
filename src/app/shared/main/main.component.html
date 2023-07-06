@@ -1,0 +1,138 @@
+<div class="home h-screen- ">
+
+  <div class="fixed top-0- z-10 w-full grid my-0 menu-container shadow-5 bg-primary align-items-center">
+    
+    <!-- MENU ESCRITORIO -->
+    <div class="hidden xl:flex col-12 p-0 menu align-content-center justify-content-center">
+      
+      <div class="mr-2 align-self-center">
+        <span *ngIf="usuario">
+          <span pButton class="p-button-text font-bold text-300 hover:text-400 text" *ngIf="btnAtras" (click)="goBack()" style="float:left; min-width: auto;">
+            <i class="fa-solid fa-chevron-left fa-lg"></i>
+          </span> 
+          
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg" 
+                 routerLink="/user/estadisticas">Estadísticas</span>
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+                  routerLink="/user/gastos">{{ accionGastos }} Gasto</span>
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+                  routerLink="/user/resumenes-debito">Gastos Débito/Efectivo</span>
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+                  routerLink="/user/resumenes-credito" [ngClass]="(detallesResumen) ? 'route-active-lg' : ''">Gastos Crédito</span>
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+                  routerLink="/user/cuotas-pendientes">Cuotas Pendientes</span>
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+                  routerLink="/user/tarjetas">Tarjetas</span>
+          <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+                  routerLink="/user/categorias">Categorías</span>
+          <!-- <span pButton class="p-button-text text-300 hover:text-400 logo" routerLinkActive="route-active-lg"
+                  routerLink="/user/cuenta">Mi cuenta</span> -->
+        </span>
+        
+        <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" 
+              *ngIf="!usuario" routerLink="/auth">Acceder</span>
+        
+        <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end" routerLinkActive="route-active-lg"
+              routerLink="acerca-de">Historial de cambios</span>
+
+        <span pButton class="p-button-text text-300 hover:text-400 logo align-items-end"
+                *ngIf="usuario" (click)="logout()">Salir</span>
+
+      </div>
+    </div>
+
+    <!-- MENU MOBILE -->
+    <div class="col-6 flex xl:hidden py-0 p-2">
+      
+      <span class="max-w-4rem p-3 font-bold text-300 hover:text-400 text-xl cursor-pointer" *ngIf="usuario && btnAtras" (click)="goBack()">
+        <i class="fa-solid fa-chevron-left"></i>
+      </span>
+      
+      <span class="max-w-4rem p-3 font-bold text-300 hover:text-400 text-xl cursor-pointer" 
+              (click)="displaySideBar = true"> <i class="fa-solid fa-bars"></i> </span>
+    </div>
+
+  </div>
+
+  
+  <p-sidebar [(visible)]="displaySideBar">
+    
+    <div class="mt-3 pb-2 logo text-xl font-bold border-bottom-1">
+      Administrador de Gastos
+    </div>
+      
+    <div class="mt-3 ml-2-" *ngIf="usuario">
+      <div routerLink="/user/estadisticas" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-chart-pie sidebar-icon"></i> Estadísticas
+      </div>
+      
+      <div routerLink="/user/gastos" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-dollar-sign sidebar-icon"></i> {{ accionGastos }} Gasto
+      </div>
+
+      <div routerLink="/user/resumenes-debito" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-sack-dollar sidebar-icon"></i> Gastos Débito/Efectivo
+      </div>
+
+      <div routerLink="/user/resumenes-credito" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button" [ngClass]="(detallesResumen) ? 'route-active' : ''">
+        <i class="fa-solid- fa-duotone fa-file-invoice-dollar sidebar-icon"></i> Gastos Crédito
+      </div>
+
+      <div routerLink="/user/cuotas-pendientes" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-money-check-dollar sidebar-icon"></i> Cuotas pendientes
+      </div>
+
+      <div routerLink="/user/tarjetas" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-regular- fa-duotone fa-credit-card sidebar-icon"></i> Tarjetas
+      </div>
+
+      <div routerLink="/user/categorias" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-rectangle-list sidebar-icon"></i> Categorías
+      </div>
+
+      <!-- <div routerLink="/user/cuenta" routerLinkActive="route-active" (click)="displaySideBar = false"
+            class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid fa-user sidebar-icon"></i> Mi cuenta
+      </div> -->
+
+    </div>
+
+    <div [ngClass]="{'mt-3': !usuario}">
+      <div routerLink="acerca-de" routerLinkActive="route-active" (click)="displaySideBar = false" 
+                class="my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+            <i class="fa-solid- fa-duotone fa-code sidebar-icon"></i> Historial de cambios
+        </div>
+    </div>
+
+    <div class="mt-3 border-top-1"  *ngIf="usuario">
+      <div (click)="logout()"class="ml-2- my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-right-from-bracket sidebar-icon"></i> Salir
+      </div>
+    </div>
+  
+    <div class="" *ngIf="!usuario">
+      <div routerLink="/auth/login"  (click)="displaySideBar = false"
+            class="ml-2- my-2 py-1 logo text-xl text-300 hover:text-400 cursor-pointer" role="button">
+        <i class="fa-solid- fa-duotone fa-right-to-bracket sidebar-icon"></i> Iniciar sesión
+      </div>
+    </div>
+      
+  </p-sidebar>    
+
+  <div class="h-4rem"></div>
+  
+  <router-outlet></router-outlet>
+
+  <div class="hidden- md:h-1rem" [ngClass]="(isPWA) ? 'h-3rem' : 'h-1rem'"></div>
+
+  <p-scrollTop [threshold]="100" styleClass="bg-primary-500" [style]="{'border-radius':'4px'}" icon="fa-duotone fa-angles-up"></p-scrollTop>
+  
+</div>
+

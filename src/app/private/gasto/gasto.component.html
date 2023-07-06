@@ -1,0 +1,92 @@
+<p-blockUI [blocked]="loading " styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+
+  <div class="col-12 md:col-8 xl:col-4 px-3">
+    <p-card header="{{ accion | titlecase }} consumo" styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast mb-3">
+      
+      <form [formGroup]="gastoForm" (ngSubmit)="guardar()">
+
+        <div class="grid justify-content-center">
+          <div class="col-12 px-0 mb-1">
+            <div class="p-float-label">
+              <input id="descripcion" type="text" pInputText class="w-full border-round-2xl" formControlName="descripcion"
+                    [ngClass]="{'ng-dirty ng-invalid':validarCampo('descripcion')}"> 
+              <label for="descripcion">Descripción</label>
+            </div>
+          </div>
+
+          <div class="col-6 pl-0 pr-1 mb-1">
+          
+            <div class="p-float-label">
+              <p-inputNumber formControlName="monto" placeholder="Monto total" inpudId="monto" styleClass="w-full" class="w-full input-monto"
+                            [maxFractionDigits]="2" locale="es-AR" mode="decimal" [useGrouping]="false"
+                            [ngClass]="{'ng-dirty ng-invalid':validarCampo('monto')}"></p-inputNumber>
+              <label for="monto">Monto total</label>
+            </div>
+          </div>
+
+          <div class="col-6 pl-1 pr-0 mb-1">
+            <div class="p-float-label">
+              <p-dropdown appendTo="body" [options]="monedas" id="moneda" optionLabel="descripcion" 
+                          optionValue="value" formControlName="moneda" [autoDisplayFirst]="true" styleClass="w-full border-round-right-2xl"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('moneda')}"></p-dropdown>
+              <label for="moneda">Moneda</label>
+            </div>
+          </div>
+
+          <div class="col-12 px-0 mb-1">
+            <div class="p-float-label">
+              <p-dropdown appendTo="body" [options]="categorias" id="categoria" placeholder="Categoria" optionLabel="descripcion"
+                          optionValue="_id" formControlName="categoria" styleClass="w-full border-round-2xl"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('categoria')}"></p-dropdown>
+              <label for="descripcion">Categoría</label>
+            </div>
+          </div>
+
+          <div class="col-12 px-0 mb-1">
+            <div class="p-float-label">
+              <p-dropdown appendTo="body" #tarjeta [options]="(tarjetas | tarjetas:'newGasto')" id="tarjeta" placeholder="Forma de pago" optionLabel="descripcion" 
+                          optionValue="_id" formControlName="tarjeta" styleClass="w-full border-round-2xl"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('tarjeta')}"></p-dropdown>
+              <label for="tarjeta">Forma de pago</label>
+            </div>
+          </div>
+
+          <div class="col-6 pl-0 pr-1 mb-1">
+            <div class="p-float-label">
+              <p-dropdown appendTo="body" #tarjeta [options]="cuotas" id="cuotas" placeholder="Cuotas" optionLabel="descripcion" 
+                          optionValue="value" formControlName="cuotas" styleClass="w-full border-round-left-2xl"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('cuotas')}"></p-dropdown>
+              <label for="cuotas">Cuotas</label>
+            </div>
+          </div>
+
+          <div class="col-6 pl-1 pr-0 mb-1">
+            <div class="p-float-label">
+              
+              <p-calendar appendTo="body" inputId="fecha" [readonlyInput]="true" formControlName="fecha" [showButtonBar]="true"
+                          [showIcon]="true" styleClass="w-full border-round-right-2xl"  dateFormat="dd/mm/yy"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('fecha')}"
+                          ></p-calendar>
+              <label for="fecha">Fecha</label>
+            </div>
+          </div>
+
+          <div class="col-6 pl-0 pr-1">
+            <button pButton pRipple type="button" class="p-button-outlined w-full border-round-left-2xl" iconPos="left"
+                    label="Resetear" (click)="resetear()" icon="fa-solid fa-arrows-rotate"></button>
+            
+          </div>
+          <div class="col-6 pl-1 pr-0">
+            <button pButton pRipple type="submit" class="w-full border-round-right-2xl" [loading]="process" 
+                    [disabled]="process" iconPos="right" icon="fa-regular fa-floppy-disk"
+                    label="{{ accion == 'agregar' ? 'Guardar' : 'Actualizar' }}"></button>
+          </div>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

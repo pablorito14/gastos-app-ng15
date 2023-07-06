@@ -1,0 +1,78 @@
+[
+	{
+		"version": "1.0.0",
+		"cambios": [
+			"Version inicial"
+		]
+	},
+  {
+		"version": "1.0.1",
+		"cambios": [
+			"Corrección de errores"
+		]
+	},
+  {
+    "version": "1.0.2",
+    "cambios": [
+      "Se agregaron mas bancos disponibles para tarjetas",
+      "Se agregó el banco al mostrar las tarjetas en las diferentes pantallas",
+      "Se mejoraron y corrigieron errores con los botones de reseteo de formularios"
+    ]
+  },
+  {
+    "version": "1.0.3",
+    "cambios": [
+      "Corrección de errores"
+    ]
+  },
+  {
+    "version": "1.0.4",
+    "cambios": [
+      "Se mejoró la sincronización de datos en tiempo real entre plataformas"
+    ]
+  },
+  {
+    "version": "1.0.5",
+    "cambios": [
+      "Corrección de errores"
+    ]
+  },
+  {
+    "version": "1.0.6",
+    "cambios": [
+      "Se cambió el ordenamiento de las categorías en la ventana de estadísticas. Ahora se muestran por valor de consumos ascendente"
+    ]
+  },
+  {
+    "version": "1.0.7",
+    "cambios": [
+      "Corrección de errores"
+    ]
+  },
+  {
+    "version": "1.0.8",
+    "cambios": [
+      "Corrección de errores"
+    ]
+  },
+  {
+    "version": "1.0.9",
+    "cambios": [
+      "Mejoras en la información mostrada en pantalla de estadísticas",
+      "Los consumos dentro de los detalles de cada categoría ahora son un link para editar el gasto"
+    ]
+  },
+  {
+    "version":"1.0.10",
+    "cambios":[
+      "Corrección de errores"
+    ]
+  },
+  {
+    "version": "1.1.0",
+    "cambios": [
+      "Se agregó Euros a monedas disponibles para consumos",
+      "Se mejoró la obtención de cotizaciones desde ambito.com"
+    ]
+  }
+]

@@ -1,0 +1,142 @@
+<p-blockUI [blocked]="loading " styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="col-12 md:col-8 xl:col-3 px-3">
+    <p-card header="{{ accion | titlecase }} tarjetas" styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast mb-3">
+      <form [formGroup]="tarjetaForm" (ngSubmit)="guardar()">
+        <div class="grid justify-content-center">
+          <div class="col-12 px-0 mb-1">
+            <div class="p-float-label">
+              <p-dropdown [options]="tipos" appendTo="body" id="tipo" placeholder="Tarjeta" optionLabel="descripcion" 
+                          optionValue="tipo" formControlName="tipo" [showClear]="true" styleClass="w-full border-round-2xl"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('tipo')}"></p-dropdown>
+              <label for="tipo">Tipo de tarjeta</label>
+            </div>
+          </div>
+
+          <div class="col-6 pl-0 pr-1 mb-1">
+            <div class="p-float-label">
+              
+              <p-dropdown [options]="bancos" appendTo="body" id="banco" placeholder="Banco" optionLabel="descripcion" 
+                          optionValue="banco" formControlName="banco" [showClear]="true" styleClass="w-full border-round-left-2xl"
+                          [ngClass]="{'ng-dirty ng-invalid':validarCampo('banco')}"></p-dropdown>
+              <label for="banco">Banco</label>
+            </div>
+          </div>
+          
+          <div class="col-6 pl-1 pr-0 mb-1">
+            <div class="p-float-label">
+              <input type="tel" id="tarjeta" pInputText placeholder="Ult. 4 números"
+                      formControlName="numero" class="w-full border-round-right-2xl" [ngClass]="{'ng-dirty ng-invalid':validarCampo('numero')}">
+              <label for="tarjeta">Ult. 4 números</label>
+            </div>
+          </div>
+
+          <!-- <div class="col-6 px-0 mb-1">
+            <div class="p-float-label">
+              <div class="p-float-label">
+                <p-inputMask mask="99/99" id="vencimiento" formControlName="numero" placeholder="Vencimiento" slotChar="mm/yy"
+                            styleClass="w-full border-round-2xl" [ngClass]="{'ng-dirty ng-invalid':validarCampo('numero')}"></p-inputMask>
+                <label for="vencimiento">Vencimiento</label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-6 px-0 mb-1">
+            <div class="p-float-label">
+              <div class="p-float-label">
+                <p-dropdown [options]="tarjetas" appendTo="body" id="tipo" placeholder="Tarjeta" optionLabel="descripcion"
+                            optionValue="_id" [showClear]="true" styleClass="w-full border-round-2xl"
+                            [ngClass]="{'ng-dirty ng-invalid':validarCampo('tipo')}"></p-dropdown>
+                <label for="renovacion">Renovacion de...</label>
+              </div>
+            </div>
+          </div> -->
+
+          <div class="col-6 pl-0 pr-1">
+            <button pButton pRipple type="button" class="p-button-outlined w-full border-round-left-2xl"
+                    [disabled]="process" iconPos="left" icon="fa-solid fa-arrows-rotate" (click)="resetear()"
+                    label="Resetear"></button>
+          </div>
+          <div class="col-6 pl-1 pr-0">
+            <button pButton pRipple type="submit" class="w-full border-round-right-2xl" [loading]="process" 
+                    [disabled]="process" iconPos="right" icon="fa-regular fa-floppy-disk"
+                    label="{{ accion == 'agregar' ? 'Guardar' : 'Actualizar' }}"></button>
+            
+          </div>
+
+          
+        </div>
+      </form>
+      
+    </p-card>
+  </div>
+  
+<!-- </div>
+
+<div class="grid flex justify-content-center" *ngIf="!loading"> -->
+  <div class="col-12 md:col-8 xl:col-4 px-3" *ngIf="tarjetas.length > 0">
+    <p-card styleClass="bg-card-custom shadow-8 animate__animated animate__fadeIn animate__fast">
+      <div class="p-card-title ng-star-inserted flex justify-content-between">
+        <span>Listado de tarjetas</span>
+        <span class="mr-2 cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+          <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+      </div>
+      
+      <p-table [value]="tarjetas" responsiveLayout="default" class="tabla-tarjetas">
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th class="px-1 text-left">Tarjeta</th>
+                <th class="px-1">Tipo</th>  
+                <th class="px-1">Banco</th>
+                <th class="pr-2- text-right">Acción</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tarjeta>
+            <tr class="border-top-1 md:border-top-none" [ngClass]="{'text-400':tarjeta.estado == 'expired'}">
+                <td class="pl-1- px-1 text-left">
+                  <span [innerHTML]="tarjeta | strTarjeta:'tarjetas'"></span>
+                    <!-- <i class="fa-brands fa-cc-{{ tarjeta.tipo }} fa-lg mr-1"></i> 
+                    {{ tarjeta.numero }} -->
+                </td>
+                <td class="px-1">{{ tarjeta.debito ? 'Debito' : 'Credito' }}</td>
+                <td class="px-1">
+                  {{ tarjeta | formatoString:'tarjeta' }}
+                  <!-- {{ (tarjeta.banco == 'bbva') ? (tarjeta.banco | uppercase) : (tarjeta.banco | titlecase) }} -->
+                </td>
+                <td class="pr-2- px-1 text-right">
+                  <div class="" *ngIf="tarjeta.estado == 'active';else expired">
+                    <span *ngIf="deletingID != tarjeta._id; else procesando">
+                      <span class="px-2 cursor-pointer" (click)="buscarTarjeta(tarjeta._id)">
+                        <i class="fa-regular- fa-duotone fa-pen-to-square text-primary-700 hover:text-primary-300" pTooltip="Editar tarjeta"></i>
+                      </span>
+                      <span class="px-2 cursor-pointer" (click)="confirm(tarjeta._id,$event)">
+                        <i class="fa-solid- fa-trash-can- fa-duotone fa-trash text-red-500 hover:text-red-300" pTooltip="Eliminar tarjeta"></i>  
+                      </span>
+                    </span>
+                    <ng-template #procesando>
+                      <i class="px-2 fa-solid fa-spinner fa-spin"></i>
+                    </ng-template>
+                    
+                  </div>
+                  <ng-template #expired>
+                    <span class="px-2">
+                      <i class="fa-regular- fa-duotone fa-pen-to-square text-400"></i>
+                    </span>
+                    <span class="px-2">
+                      <i class="fa-solid- fa-trash-can- fa-duotone fa-trash text-400"></i>
+                    </span>
+                  </ng-template>
+                  
+                </td>
+            </tr>
+        </ng-template>
+
+      </p-table>
+      <p-confirmPopup></p-confirmPopup>
+    </p-card>
+  </div>
+</div>
+

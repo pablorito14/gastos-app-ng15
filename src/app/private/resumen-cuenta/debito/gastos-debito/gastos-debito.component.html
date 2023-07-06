@@ -1,0 +1,138 @@
+<p-blockUI [blocked]="loading" styleClass="z-5">
+  <p-progressSpinner></p-progressSpinner>
+</p-blockUI>
+
+<div class="grid flex justify-content-center" *ngIf="!loading">
+  <div class="col-12 lg:col-9 xl:col-8 px-3">
+    <div class="animate__animated animate__fadeIn animate__fast mb-3-" *ngIf="!loading">
+      <div class="grid p-0 m-0">
+        <div class="col-12 p-0 text-center-">
+            <p-dropdown appendTo="body" [(ngModel)]="tarjetaSel" [options]="(allData | tarjetas:'debitos')" id="tarjeta" placeholder="Tarjeta" optionLabel="descripcion" 
+                        optionValue="_id" styleClass="w-full border-round-2xl" (onChange)="cambiarTarjeta($event.value,0)"
+                        ></p-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid flex justify-content-center">
+  <!-- <div class="col-12 md:col-8 lg:col-10 xl:col-10 px-3"> -->
+  <div class="col-12 lg:col-9 xl:col-8 px-3">
+    <p-card  class="animate__animated animate__fadeIn animate__fast mb-3" *ngIf="!loading && dataShow">
+      <div class="grid justify-content-center">
+        <div class="col-12 lg:col-8- text-center">
+          <div class="p-card-title ng-star-inserted mb-0 flex justify-content-between align-items-center">
+            <div style="min-width: 25px;"></div>
+            <div class="font-bold text-xl" [innerHTML]="dataShow | strTarjeta:'estadisticas'"></div>
+            <span class="mr-2- cursor-pointer hover:text-600" (click)="actualizar()" pTooltip="Actualizar">
+              <i class="fa-duotone fa-arrow-rotate-right" [ngClass]="{'fa-spin': reload}"></i></span>
+          </div>
+          <!-- <div class="font-bold text-xl" [innerHTML]="dataShow | strTarjeta:'estadisticas'"></div>  -->
+        </div>
+        <div class="col-12 lg:col-12 lg:inline-flex text-center align-items-center">
+          <div class="w-full mb-2 md:mb-0 md:flex-order-1"> 
+            
+            <span *ngIf="resumenActual; else noResumen">
+              <div class="font-medium">Periodo: {{ moment(resumenActual.inicio).format('MMMM YYYY') }}</div>
+              <div>{{ moment(resumenActual!.inicio).format('ddd DD [de] MMM YY') }} - {{ moment(resumenActual!.cierre).format('ddd DD [de] MMM YY') }}</div>
+              <div class="font-medium text-xl">
+                <div class="hidden md:block">
+                  {{ resumenActual.montoPesos | currency:'$':'symbol-narrow':'1.2-2' }} / 
+                  {{ resumenActual.montoDolares | currency:'U$D':'symbol-narrow':'1.2-2' }} / 
+                  {{ resumenActual.montoEuros | currency: '€':'symbol-narrow':'1.2-2' }}
+                </div>
+                <div class="block md:hidden">
+                  {{ resumenActual.montoPesos | currency:'$':'symbol-narrow':'1.2-2' }} <br> 
+                  {{ resumenActual.montoDolares | currency:'U$D':'symbol-narrow':'1.2-2' }} / 
+                  {{ resumenActual.montoEuros | currency: '€':'symbol-narrow':'1.2-2' }}
+                </div>
+              </div>
+            </span>
+            <ng-template #noResumen>
+              No hay resumenes para esta tarjeta
+            </ng-template>
+          </div>
+
+          <span class="w-6- md:flex-order-0">
+            <button pButton pRipple type="button" label="Anterior"  icon="fa-solid- fa-duotone fa-angles-left fa-lg" 
+                    class="p-button-raised p-button-text p-button-plain m-2 border-round-left-2xl" [disabled]="dataShow.resumenes.length <= 0 || (resumenActual.indice+1) >= dataShow.resumenes.length"
+                    (click)="prevResumen(resumenActual.indice)"></button>
+          </span>
+          <span class="w-6- md:flex-order-2">
+            <button pButton pRipple type="button" label="Siguiente" icon="fa-solid- fa-duotone fa-angles-right fa-lg" iconPos="right" 
+                    class="p-button-raised p-button-text p-button-plain m-2 border-round-right-2xl" [disabled]="dataShow.resumenes.length <= 0 || resumenActual.indice == 0"
+                    (click)="nextResumen(resumenActual.indice)"></button>
+          </span>
+        </div>
+      </div>
+
+      <p-table responsiveLayout="stack" [value]="resumenActual.cuotas" breakpoint="768px" styleClass="w-full" *ngIf="resumenActual.cuotas.length > 0; else noCuotas">
+        
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th class="pl-0">Consumo</th>
+                <th class="text-center">Fecha</th>
+                <th class="pr-0 text-right">Monto</th>
+                <th class="text-right">Acciones</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-consumo>
+            <tr class="border-top-1 md:border-top-none">
+                
+              <td class="text-right md:text-left py-2 px-0">
+                <span class="p-column-title">Consumo</span>
+                {{ consumo.descripcion }}
+              </td>
+              <td class="text-right md:text-center py-2 px-0 debitos-column-width">
+                <span class="p-column-title">Fecha</span>
+                {{ moment(consumo.fecha).format('DD/MM/Y') }}
+              </td>
+
+              <td class="text-right py-2 px-0 debitos-column-width">
+                <span class="p-column-title">Total</span>
+                {{ consumo.monto | currency:consumo.moneda:'symbol-narrow':'1.2-2' }}
+              </td>
+              <td class="text-center md:text-right py-2 px-0 md:px-2 debitos-column-width">
+                
+                <span class="p-column-title">Acciones</span>
+                <div class="hidden- md:block" >
+                  <span *ngIf="deletingID != consumo._id;else procesando">
+                    <span *ngIf="!consumo.fecha_baja; else susc_cancelada">
+                      <span class="px-2 cursor-pointer" [routerLink]="['/user/gastos',consumo._id]" >
+                        <i class="fa-regular- fa-duotone fa-pen-to-square text-primary-700 hover:text-primary-300" pTooltip="Editar consumo"></i>
+                      </span>
+                      <span class="pl-2 pr-1 cursor-pointer" (click)="confirm(consumo._id,$event)">
+                        <i class="fa-solid- fa-duotone fa-trash text-red-500 hover:text-red-300" pTooltip="Eliminar consumo"></i>
+                      </span>
+                    </span>
+                    <ng-template #susc_cancelada>
+                      <span class="px-2">
+                        <i class="fa-regular- fa-duotone fa-pen-to-square text-400"></i>
+                      </span>
+                      <span class="pl-1 pr-0">
+                        <i class="fa-solid- fa-duotone fa-trash text-400"></i>
+                      </span>
+                    </ng-template>
+                  </span>
+                  <ng-template #procesando><i class="px-2 fa-solid- fa-duotone fa-spinner fa-spin"></i></ng-template>
+                  
+                </div>
+              </td>
+            </tr>
+        </ng-template>
+      </p-table>
+
+      <ng-template #noCuotas>
+        <div class="col-12 flex justify-content-center">
+          <span class="font-bold text-lg mt-3">No hay gastos para este periodo</span>
+        </div>
+      </ng-template>
+      
+      
+
+      <p-confirmPopup></p-confirmPopup>
+    </p-card>
+  </div>
+</div>
+
