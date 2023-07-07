@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CanDeactivate } from '@angular/router';
+
 import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SalirGuard implements CanDeactivate<unknown> {
+export class SalirGuard  {
 
 
 
