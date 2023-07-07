@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, CanActivateChild, CanLoad, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Observable, tap, of, take } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NotificacionesService } from '../services/notificaciones.service';
@@ -8,7 +8,7 @@ import { CotizacionesService } from '../services/cotizaciones.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ValidarTokenGuard implements CanActivate, CanLoad,CanActivateChild {
+export class ValidarTokenGuard  {
   constructor(private auth: AuthService,
               private notificacion:NotificacionesService,
               private cotizaciones:CotizacionesService,
